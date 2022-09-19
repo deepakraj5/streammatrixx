@@ -9,3 +9,11 @@ export {
 export {
     Client
 } from 'https://deno.land/x/postgres@v0.16.1/mod.ts'
+
+export {
+    hashSync, compareSync
+} from "https://deno.land/x/bcrypt@v0.4.0/mod.ts"
+
+export {
+    create, verify
+} from "https://deno.land/x/djwt@v2.7/mod.ts"
