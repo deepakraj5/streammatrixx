@@ -17,6 +17,6 @@ const client = new Client({
 })
 
 // connect to db
-await client.connect()
+// await client.connect()
 
 export default client

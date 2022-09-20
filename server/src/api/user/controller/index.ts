@@ -11,9 +11,10 @@ const router = new Router()
 router.post('/signup', async ctx => {
     try {
         
-        const payload = ctx.request.body as unknown as NewUser
-        
-        const response = await newUser(payload)
+        const payload = ctx.request.body({ type: "json" })
+        const body: NewUser = await payload.value
+
+        const response = await newUser(body)
 
         ctx.response.body = response
 
@@ -29,7 +30,8 @@ router.post('/signup', async ctx => {
 router.post('/login', async ctx => {
     try {
         
-        const payload = ctx.request.body as unknown as Login
+        const payload = ctx.request.body({ type: "json" })
+        const body: Login = await payload.value
         
 
     } catch (error) {

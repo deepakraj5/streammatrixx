@@ -29,7 +29,11 @@ const newDatabase = async () => {
 
 
 
-// create new user
+/**
+ * Signup new user
+ * @params {NewUser} payload
+ * @returns response
+ */
 const newUser = async (payload: NewUser) => {
     try {
 
@@ -49,7 +53,11 @@ const newUser = async (payload: NewUser) => {
 
 
 
-// login
+/**
+ * User login
+ * @param {Login} payload 
+ * @returns {User} user
+ */
 const login = async (payload: Login) => {
     try {
 
