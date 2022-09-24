@@ -1,6 +1,7 @@
 import client from "../../../db/index.ts";
 import { Login, NewUser, User } from "../dto/index.ts";
-import { hashSync, compareSync, create, config } from '../../../../deps.ts'
+import { hashSync, compareSync, Jose, config } from '../../../../deps.ts'
+import { stringToUnit8Array } from "../../../utils/jwt.ts";
 
 // env
 const env = config()
@@ -10,7 +11,7 @@ const newDatabase = async () => {
     try {
         
         const response = await client.queryObject(
-            `CREATE TABLE user (
+            `CREATE TABLE users (
                 id int primary key,
                 name varchar(24),
                 email varchar(24),
@@ -37,13 +38,15 @@ const newDatabase = async () => {
 const newUser = async (payload: NewUser) => {
     try {
 
-        payload.password = hashSync(payload.password, '12')
+        payload.password = hashSync(payload.password)
+        payload.isActive = false
 
         const response = await client.queryObject(
-            `INSERT INTO user VALUES (${payload.id}, '${payload.name}', '${payload.email}', '${payload.password}', ${payload.isActive})`
+            `INSERT INTO users (name, email, password, isActive) VALUES ('${payload.name}', '${payload.email}', '${payload.password}', ${payload.isActive})`
         )
 
-        return response
+        if(response?.rowCount === 1) return { message: "user created" }
+        else return { message: "not able to create user" }
 
     } catch (error) {
         console.log(error)
@@ -56,13 +59,13 @@ const newUser = async (payload: NewUser) => {
 /**
  * User login
  * @param {Login} payload 
- * @returns {User} user
+ * @returns user
  */
 const login = async (payload: Login) => {
     try {
 
         const { rows } = await client.queryObject(
-            `SELECT * FROM users WHERE email = ${payload.email}`
+            `SELECT * FROM users WHERE email = '${payload.email}'`
         )
 
         if(rows.length === 0) throw new Error("Wrong email or password")
@@ -73,10 +76,21 @@ const login = async (payload: Login) => {
 
         if(!checkPassword) throw new Error("Wrong email or password")
 
-        // create wt token
-        // const token = await create({ alg: "HS256" }, { id: user.id, email: user.email }, env.JWT_SECRET)
+        // create jwt token
+        const key: Uint8Array = stringToUnit8Array(env.JWT_SECRET)
 
-        return user
+        const token = await new Jose.SignJWT({ id: user.id, email: user.email })
+                                    .setExpirationTime('2h')
+                                    .setIssuedAt()
+                                    .setProtectedHeader({ alg: "HS256" })
+                                    .sign(key)
+
+        const { password, ...restParams } = user
+
+        return {
+            user: restParams,
+            token
+        }
 
     } catch (error) {
         console.log(error)

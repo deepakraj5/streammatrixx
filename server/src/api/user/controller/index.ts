@@ -1,7 +1,8 @@
 import { Router } from '../../../../deps.ts'
-import { newUser, newDatabase } from '../service/index.ts'
+import { newUser, newDatabase, login } from '../service/index.ts'
 import { NewUser } from '../dto/index.ts'
 import { Login } from '../dto/index.ts'
+import auth from '../../../middleware/auth.ts'
 
 // init router
 const router = new Router()
@@ -32,7 +33,10 @@ router.post('/login', async ctx => {
         
         const payload = ctx.request.body({ type: "json" })
         const body: Login = await payload.value
-        
+
+        const response = await login(body)
+
+        ctx.response.body = response
 
     } catch (error) {
         console.log(error)
@@ -40,7 +44,6 @@ router.post('/login', async ctx => {
         ctx.response.body = error
     }
 })
-
 
 
 // export router
