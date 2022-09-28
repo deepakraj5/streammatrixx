@@ -27,8 +27,11 @@ const auth = async (ctx: Context, next: () => any) => {
 
         const user: User = rows[0] as unknown as User
 
+        // deno-lint-ignore no-unused-vars
+        const { password, ...restParams } = user
+
         // save current user to state
-        ctx.state.user = user
+        ctx.state.user = restParams
 
         await next()
 

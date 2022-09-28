@@ -1,6 +1,6 @@
 import { Router } from '../../../../deps.ts'
-import { newUser, newDatabase, login } from '../service/index.ts'
-import { NewUser } from '../dto/index.ts'
+import { newUser, login } from '../service/index.ts'
+import { NewUser, User } from '../dto/index.ts'
 import { Login } from '../dto/index.ts'
 import auth from '../../../middleware/auth.ts'
 
@@ -37,6 +37,26 @@ router.post('/login', async ctx => {
         const response = await login(body)
 
         ctx.response.body = response
+
+    } catch (error) {
+        console.log(error)
+        ctx.response.status = 500
+        ctx.response.body = error
+    }
+})
+
+
+/**
+ * User profile
+ * @returns user
+ */
+router.get('/profile', auth, async ctx => {
+    try {
+        
+        // current user
+        const user: User = await ctx.state.user
+
+        ctx.response.body = user
 
     } catch (error) {
         console.log(error)

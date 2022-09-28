@@ -68,13 +68,13 @@ const login = async (payload: Login) => {
             `SELECT * FROM users WHERE email = '${payload.email}'`
         )
 
-        if(rows.length === 0) throw new Error("Wrong email or password")
+        if(rows.length === 0) return ("Wrong email or password")
 
         // validate password
         const user: User = rows[0] as unknown as User
         const checkPassword = compareSync(payload.password, user.password)
 
-        if(!checkPassword) throw new Error("Wrong email or password")
+        if(!checkPassword) return new Error("Wrong email or password")
 
         // create jwt token
         const key: Uint8Array = stringToUnit8Array(env.JWT_SECRET)
@@ -85,6 +85,7 @@ const login = async (payload: Login) => {
                                     .setProtectedHeader({ alg: "HS256" })
                                     .sign(key)
 
+        // deno-lint-ignore no-unused-vars
         const { password, ...restParams } = user
 
         return {
