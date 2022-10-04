@@ -1,6 +1,6 @@
 import client from "../db/index.ts"
 import { Context, Jose, config } from '../../deps.ts'
-import { stringToUnit8Array } from "../utils/jwt.ts"
+import { stringToUint8Array } from "../utils/core.ts"
 import { User } from "../api/user/dto/index.ts"
 
 // env
@@ -12,7 +12,7 @@ const auth = async (ctx: Context, next: () => any) => {
         // jwt from header
         const token = ctx.request.headers.get("Authorization")?.split("Bearer ")[1]
 
-        const key: Uint8Array = stringToUnit8Array(env.JWT_SECRET)
+        const key: Uint8Array = stringToUint8Array(env.JWT_SECRET)
 
         // verify token
         const verifiedToken = await Jose.jwtVerify(token as string, key)

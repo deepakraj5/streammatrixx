@@ -1,7 +1,7 @@
 import client from "../../../db/index.ts";
 import { Login, NewUser, User } from "../dto/index.ts";
 import { hashSync, compareSync, Jose, config } from '../../../../deps.ts'
-import { stringToUnit8Array } from "../../../utils/jwt.ts";
+import { stringToUint8Array } from "../../../utils/core.ts";
 
 // env
 const env = config()
@@ -77,7 +77,7 @@ const login = async (payload: Login) => {
         if(!checkPassword) return new Error("Wrong email or password")
 
         // create jwt token
-        const key: Uint8Array = stringToUnit8Array(env.JWT_SECRET)
+        const key: Uint8Array = stringToUint8Array(env.JWT_SECRET)
 
         const token = await new Jose.SignJWT({ id: user.id, email: user.email })
                                     .setExpirationTime('2h')
